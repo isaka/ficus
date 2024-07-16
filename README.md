@@ -59,21 +59,12 @@ For more detailed examples and how they match up with what's defined in a config
 
 # Adding the dependency #
 
-
 Now add the Ficus dependency to your build SBT file as well:
 ```scala
-// for Scala 2.10.x
-libraryDependencies += "com.iheart" %% "ficus" % "1.0.2"
 
-// for Scala 2.11.x and Java 7
-libraryDependencies += "com.iheart" %% "ficus" % "1.1.3"
-
-// for Scala 2.11.x, 2.12.x, 2.13.x and Java 8
-// See the latest version in the download badge below.
-libraryDependencies += "com.iheart" %% "ficus" % <latest version> //see latest version in the badge below
+// Only tested with Scala 2.13.x and Java 21
+libraryDependencies += "com.mimozar" %% "ficus" % "1.5.3.1-SNAPSHOT" // see your local repo build report, 
 ```
-
-[![Latest version](https://index.scala-lang.org/iheartradio/ficus/ficus/latest.svg?color=orange)](https://index.scala-lang.org/iheartradio/ficus)
 
 If you want to take advantage of Ficus's ability to automatically hydrate arbitrary traits and classes from configuration, you need to be on Scala version 2.10.2 or higer, because this functionality depends on implicit macros.
 
@@ -162,10 +153,5 @@ When you call `as[String]("somePath")`, Ficus config knows how to extract a Stri
 
 Many thanks to all of [those who have contributed](https://github.com/iheartradio/ficus/blob/master/CONTRIBUTORS.md) to Ficus.
 
-Would you like to contribute to Ficus? Pull requests are welcome and encouraged! Please note that contributions will be under the [MIT license](https://github.com/iheartradio/ficus/blob/master/LICENSE). Please provide unit tests along with code contributions.
+Would you like to contribute to Ficus? PLease go to the original repo, not this one!
 
-
-
-## Binary Compatibility
-
-[MiMa](https://github.com/typesafehub/migration-manager) can be used to check the binary compatibility between two versions of a library.T To check for binary incompatibilities, run `mimaReportBinaryIssues` in the sbt repl. The build is configured to compare the current version against the last released version (It does this naïvely at the moment by merely decrementing bugfix version). If any binary compatibility issues are detected, you may wish to adjust your code to maintain binary compatibility, if that is the goal, or modify the minor version to indicate to consumers that the new version should not be considered binary compatible.
