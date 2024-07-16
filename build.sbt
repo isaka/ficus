@@ -1,4 +1,4 @@
-import sbtrelease.Version
+
 
 val gc          = TaskKey[Unit]("gc", "runs garbage collector")
 lazy val gcTask = gc := {
@@ -6,46 +6,10 @@ lazy val gcTask = gc := {
   System gc ()
 }
 
-def Scala3 = "3.1.1"
+def TargetScalaVersion = "2.13.14"
 
-ThisBuild / githubWorkflowBuild := Seq(
-  WorkflowStep.Sbt(List("mimaReportBinaryIssues"), name = Some("Report binary compatibility issues")),
-  WorkflowStep.Sbt(
-    List("clean", "test"),
-    name = Some("Build project"),
-    cond = Some(s"matrix.scala == '${Scala3}'")
-  ),
-  WorkflowStep.Sbt(
-    List("clean", "coverage", "test"),
-    name = Some("Build project"),
-    cond = Some(s"matrix.scala != '${Scala3}'")
-  )
-)
-
-ThisBuild / githubWorkflowBuildPostamble ++= Seq(
-  // See https://github.com/scoverage/sbt-coveralls#github-actions-integration
-  WorkflowStep.Sbt(
-    List("coverageReport", "coveralls"),
-    name = Some("Upload coverage data to Coveralls"),
-    cond = Some(s"matrix.scala != '${Scala3}'"),
-    env = Map(
-      "COVERALLS_REPO_TOKEN" -> "${{ secrets.GITHUB_TOKEN }}",
-      "COVERALLS_FLAG_NAME"  -> "Scala ${{ matrix.scala }}"
-    )
-  )
-)
-
-// This is causing problems with env variables being passed in, see
-// https://github.com/sbt/sbt/issues/6468
-ThisBuild / githubWorkflowUseSbtThinClient := false
-
-ThisBuild / githubWorkflowPublishTargetBranches := Seq()
-
-ThisBuild / crossScalaVersions := Seq("2.10.7", "2.11.12", "2.13.6", "2.12.14", Scala3)
+ThisBuild / crossScalaVersions := Seq("2.13.14", TargetScalaVersion)
 ThisBuild / scalaVersion       := (ThisBuild / crossScalaVersions).value.last
-
-// Coveralls doesn't really work with Scala 2.10.7 so we are disabling it for CI
-ThisBuild / githubWorkflowScalaVersions -= "2.10.7"
 
 lazy val root = project
   .in(file("."))
@@ -96,7 +60,7 @@ lazy val root = project
     libraryDependencies ++= {
       if (scalaBinaryVersion.value != "3") {
         Seq(
-          "com.chuusai"   %% "shapeless"      % "2.3.3"            % Test,
+          "com.chuusai"   %% "shapeless"      % "2.3.12"            % Test,
           "org.scala-lang" % "scala-reflect"  % scalaVersion.value % Provided,
           "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
         )
@@ -105,27 +69,15 @@ lazy val root = project
       }
     },
     libraryDependencies ++=
-      (if (scalaVersion.value.startsWith("2.10"))
-         Seq("org.specs2" %% "specs2-core" % "3.10.0" % Test, "org.specs2" %% "specs2-scalacheck" % "3.10.0" % Test)
-       else if (Set("2.11", "2.12", "2.13").contains(scalaBinaryVersion.value))
+      (if (Set("2.13").contains(scalaBinaryVersion.value))
          Seq("org.specs2" %% "specs2-core" % "4.8.3" % Test, "org.specs2" %% "specs2-scalacheck" % "4.8.3" % Test)
        else
          Seq("org.specs2" %% "specs2-core" % "5.0.0" % Test, "org.specs2" %% "specs2-scalacheck" % "5.0.0" % Test)) ++
-        Seq(
-          "com.typesafe" % "config" % "1.3.4"
-        ) ++
-        (if (Set("2.10", "2.11", "2.12").contains(scalaBinaryVersion.value))
-           Seq(
-             compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-             "org.typelevel" %% "macro-compat" % "1.1.1"
-           )
-         else
-           Seq.empty[ModuleID]),
+         Seq("com.typesafe" % "config" % "1.3.4"),
     resolvers ++= Seq(
-      Resolver.sonatypeRepo("snapshots"),
       Resolver.bintrayRepo("iheartradio", "maven"),
       Resolver.jcenterRepo
-    ),
+    ) ++ Resolver.sonatypeOssRepos("snapshots"),
     Test / parallelExecution        := true,
     /* sbt behavior */
     compile / logLevel              := Level.Warn,
@@ -139,12 +91,5 @@ lazy val root = project
     },
     Publish.settings,
     releaseCrossBuild               := true,
-    mimaPreviousArtifacts           :=
-      Version(version.value)
-        .collect {
-          case Version(major, (minor :: bugfix :: _), _) if (scalaBinaryVersion.value != "2.10") && bugfix > 0 =>
-            Set(organization.value %% name.value % Seq(major, minor, bugfix - 1).mkString("."))
-        }
-        .getOrElse(Set.empty),
     gcTask
   )

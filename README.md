@@ -5,10 +5,11 @@ Ficus is a lightweight companion to Typesafe config that makes it more Scala-fri
 
 Ficus adds an `as[A]` method to a normal [Typesafe Config](http://lightbend.github.io/config/latest/api/com/typesafe/config/Config.html) so you can do things like `config.as[Option[Int]]`, `config.as[List[String]]`, or even `config.as[MyClass]`. It is implemented with type classes so that it is easily extensible and many silly mistakes can be caught by the compiler.
 
-[![Build Status](https://github.com/iheartradio/ficus/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/iheartradio/ficus/actions/workflows/ci.yml?query=branch%3Amaster)
-[![Join the chat at https://gitter.im/iheartradio/ficus](https://badges.gitter.im/iheartradio/ficus.svg)](https://gitter.im/iheartradio/ficus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Coverage Status](https://coveralls.io/repos/github/iheartradio/ficus/badge.svg?branch=master)](https://coveralls.io/github/iheartradio/ficus?branch=master)
-[![Latest version](https://index.scala-lang.org/iheartradio/ficus/ficus/latest.svg?color=orange)](https://index.scala-lang.org/iheartradio/ficus)
+# NOTE!! # 
+You really are not looking for this repo, instead you want the original. I only wanted it to build locally, and not support any Scala version 
+lower thn 2.13.14.
+
+You've been warned. 😀
 
 # Examples #
 ```scala

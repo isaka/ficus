@@ -1,64 +1,39 @@
-import sbt._
-import Keys._
-import com.jsuereth.sbtpgp.PgpKeys
-import sbtrelease.ReleasePlugin.autoImport._
-import sbtrelease.ReleaseStateTransformations._
+import sbt.*
+import sbt.Keys.*
+import sbtrelease.ReleasePlugin.autoImport.*
+import sbtrelease.ReleaseStateTransformations.*
+
+import scala.xml.Elem
 
 object Publish {
 
+  private val developers: Elem = <developers>
+    <developer>
+      <id>ceedubs</id>
+      <name>Cody Allen</name>
+      <email>ceedubs@gmail.com</email>
+    </developer>
+    <developer>
+      <id>kailuowang</id>
+      <name>Kailuo Wang</name>
+      <email>kailuo.wang@gmail.com</email>
+    </developer>
+  </developers>
   pomExtra in Global := {
 
-    <developers>
-        <developer>
-          <id>ceedubs</id>
-          <name>Cody Allen</name>
-          <email>ceedubs@gmail.com</email>
-        </developer>
-        <developer>
-          <id>kailuowang</id>
-          <name>Kailuo Wang</name>
-          <email>kailuo.wang@gmail.com</email>
-        </developer>
-      </developers>
+    developers
   }
 
   val publishingSettings = Seq(
-    ThisBuild / organization      := "com.iheart",
+    ThisBuild / organization      := "com.mimozar",
     publishMavenStyle             := true,
     licenses                      := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.html")),
-    homepage                      := Some(url("http://iheartradio.github.io/ficus")),
-    scmInfo                       := Some(
-      ScmInfo(
-        url("https://github.com/iheartradio/ficus"),
-        "git@github.com:iheartradio/ficus.git",
-        Some("git@github.com:iheartradio/ficus.git")
-      )
-    ),
     pomIncludeRepository          := { _ => false },
     Test / publishArtifact        := false,
-    publishTo                     := {
-      val nexus = "https://oss.sonatype.org/"
-      if (isSnapshot.value)
-        Some("Snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("Releases" at nexus + "service/local/staging/deploy/maven2")
-    },
-    pomExtra                      := (
-      <developers>
-        <developer>
-          <id>ceedubs</id>
-          <name>Cody Allen</name>
-          <email>ceedubs@gmail.com</email>
-        </developer>
-        <developer>
-          <id>kailuowang</id>
-          <name>Kailuo Wang</name>
-          <email>kailuo.wang@gmail.com</email>
-        </developer>
-      </developers>
-    ),
+    publishTo                     := Some("Local Repo" at "~/.m2/repository/releases"),
+    pomExtra                      := developers,
     releaseCrossBuild             := true,
-    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+//    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
     releaseProcess                := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
